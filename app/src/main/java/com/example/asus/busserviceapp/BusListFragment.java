@@ -1,10 +1,8 @@
 package com.example.asus.busserviceapp;
 
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,9 +31,6 @@ public class BusListFragment extends Fragment {
 BusListAdapter busListAdapter;
 @BindView(R.id.placeholderText)TextView placeholderText;
 Retrofit retrofit;
-    @BindView(R.id.activity_main_swipe_refresh_layout)
-    SwipeRefreshLayout refreshLayout;
-SharedPreferences sharedPreferences;
     public BusListFragment() {
         // Required empty public constructor
     }
@@ -46,48 +41,31 @@ SharedPreferences sharedPreferences;
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_bus_list, container, false);
-        // Storage init
-        sharedPreferences = getActivity().getSharedPreferences("ADASCM", getActivity().MODE_PRIVATE);
-
-        final String direction=sharedPreferences.getString("direction","");
-        final String route=sharedPreferences.getString("route_id","0");
-        final String counter=sharedPreferences.getString("counter_id","0");
         ButterKnife.bind(this,view);
-        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        retrofit= APIInitializer.initNetwork(getActivity());
+        retrofit.create(IBusTrip.class).GetBusInfo(16,"Down",2).enqueue(new Callback<BusTripModel[]>() {
             @Override
-            public void onRefresh() {
-                loadContent(route,direction,counter);
+            public void onResponse(Call<BusTripModel[]> call, Response<BusTripModel[]> response) {
+                if(response.body()==null|| response.body().length==0){
+                    placeholderText.setVisibility(View.VISIBLE);
+                }else{
+                    placeholderText.setVisibility(View.GONE);
+                }
+                busListAdapter=new BusListAdapter(getActivity(),response.body());
+                Log.e("URl",call.request().url().toString());
+                busList.setAdapter(busListAdapter);
+            }
+
+            @Override
+            public void onFailure(Call<BusTripModel[]> call, Throwable t) {
+
             }
         });
 
-        loadContent(route,direction,counter);
 
         return view;
     }
-public void loadContent(String route,String direction,String counter){
-    retrofit= APIInitializer.initNetwork(getActivity());
-    retrofit.create(IBusTrip.class).GetBusInfo(Integer.parseInt(route),direction,Integer.parseInt(counter)).enqueue(new Callback<BusTripModel[]>() {
-        @Override
-        public void onResponse(Call<BusTripModel[]> call, Response<BusTripModel[]> response) {
-            if(response.body()==null|| response.body().length==0){
-                placeholderText.setVisibility(View.VISIBLE);
-            }else{
-                placeholderText.setVisibility(View.GONE);
-            }
-            busListAdapter=new BusListAdapter(getActivity(),response.body());
-            Log.e("URl",call.request().url().toString());
-            busList.setAdapter(busListAdapter);
-            refreshLayout.setRefreshing(false);
-        }
 
-        @Override
-        public void onFailure(Call<BusTripModel[]> call, Throwable t) {
-            refreshLayout.setRefreshing(false);
-            placeholderText.setVisibility(View.VISIBLE);
-            busList.setAdapter(null);
-        }
-    });
-}
 
     public static BusListFragment newInstance() {
         return new BusListFragment();

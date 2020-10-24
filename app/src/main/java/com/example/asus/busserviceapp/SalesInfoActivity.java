@@ -1,9 +1,6 @@
 package com.example.asus.busserviceapp;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -52,40 +49,24 @@ public class SalesInfoActivity extends AppCompatActivity {
     CounterModel[] allCouters;
     List<TripDetailsData> tripDetailsDataList;
 
-    private SharedPreferences sharedPreferences;
-;
-    String direction;
-    String route;
-    String counter;
-    int busId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sales_info);
         getSupportActionBar().setTitle("Input Sales");
         ButterKnife.bind(this);
-
-        // stirage
-        sharedPreferences = getSharedPreferences("ADASCM", MODE_PRIVATE);
-
-        direction=sharedPreferences.getString("direction","");
-        route=sharedPreferences.getString("route_id","0");
-        counter=sharedPreferences.getString("counter_id","0");
-        busId= getIntent().getIntExtra("bus_id",0);
-
-
         // Network init
 
         tripDetailsDataList=new ArrayList<>();
         retrofit= APIInitializer.initNetwork(this);
         CounterListener=retrofit.create(ICounter.class);
 
-        CounterListener.GetCounters(Integer.parseInt(route),direction,Integer.parseInt(counter)).enqueue(new Callback<CounterModel[]>() {
+        CounterListener.GetCounters(16,"Down",21).enqueue(new Callback<CounterModel[]>() {
             @Override
             public void onResponse(Call<CounterModel[]> call, Response<CounterModel[]> response) {
-                Log.e("Tag",call.request().url().toString());
                 allCouters=response.body();
-                ArrayAdapter<CounterModel> arrayAdapter=new ArrayAdapter<CounterModel>(getApplicationContext(),R.layout.simple_list_style,R.id.txtcounter,allCouters);
+                ArrayAdapter<CounterModel> arrayAdapter=new ArrayAdapter<CounterModel>(getApplicationContext(),android.R.layout.simple_list_item_1,allCouters);
                 toCounter.setAdapter(arrayAdapter);
             }
 
@@ -108,19 +89,17 @@ public class SalesInfoActivity extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        final ProgressDialog progressDialog = new ProgressDialog(SalesInfoActivity.this);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Saving...");
-        progressDialog.show();
+
         switch (item.getItemId()) {
             case R.id.action_settings:
                 TripMasterData tripMasterData= new TripMasterData();
-                tripMasterData.setBusId(busId);
-                tripMasterData.setAreaId(Integer.parseInt(counter));
-                tripMasterData.setDirection(direction);
-                tripMasterData.setRouteId(Integer.parseInt(route));
+                tripMasterData.setBusId(7);
+                tripMasterData.setAreaId(21);
+                tripMasterData.setDirection("Down");
+                tripMasterData.setRouteId(16);
 
                 WayBillModel wayBillModel=new WayBillModel();
                 wayBillModel.setTripMasterData(tripMasterData);
@@ -132,8 +111,6 @@ public class SalesInfoActivity extends AppCompatActivity {
                     public void onResponse(Call<OutputModel> call, Response<OutputModel> response) {
 
                         Toast.makeText(SalesInfoActivity.this, response.body().getMsg(), Toast.LENGTH_SHORT).show();
-                        Intent intent=new Intent(SalesInfoActivity.this,MainActivity.class);
-                        startActivity(intent);
                     }
 
                     @Override
@@ -141,6 +118,8 @@ public class SalesInfoActivity extends AppCompatActivity {
                         Toast.makeText(SalesInfoActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+
+                Toast.makeText(SalesInfoActivity.this, "Saved", Toast.LENGTH_SHORT).show();
                 return true;
 
             default:
@@ -149,7 +128,6 @@ public class SalesInfoActivity extends AppCompatActivity {
     }
 
     public void add(View v){
-
 
         String selectedCounter=toCounter.getText().toString();
         Toast.makeText(SalesInfoActivity.this, selectedCounter, Toast.LENGTH_SHORT).show();
@@ -166,17 +144,13 @@ public class SalesInfoActivity extends AppCompatActivity {
             TripDetailsData tripDetailsData=new TripDetailsData();
             tripDetailsData.setToArea(selectedCounterModel.getAreaId());
             tripDetailsData.setToAreaName(selectedCounterModel.getAreaName());
-
             tripDetailsData.setNoOfPassenger(Integer.parseInt(passenger.getText().toString()));
-
-            tripDetailsData.setFromArea(Integer.parseInt(counter)); // static data problem
+            tripDetailsData.setFromArea(21); // static data
 
             tripDetailsDataList.add(tripDetailsData);
 
             CounterListAdapter counterListAdapter=new CounterListAdapter(getApplication(),tripDetailsDataList);
             tripList.setAdapter(counterListAdapter);
-            passenger.setText("");
-            toCounter.setText("");
         }
 
 

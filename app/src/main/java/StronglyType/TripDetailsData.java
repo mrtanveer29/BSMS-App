@@ -12,8 +12,9 @@ public class TripDetailsData {
     private Integer toArea;
     @SerializedName("no_of_passenger")
     @Expose
-    private Integer noOfPassenger;
     private String toAreaName;
+    private Integer noOfPassenger;
+
     public Integer getFromArea() {
         return fromArea;
     }

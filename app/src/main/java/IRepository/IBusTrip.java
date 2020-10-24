@@ -12,5 +12,5 @@ import retrofit2.http.Query;
  */
 public interface IBusTrip {
     @GET("Trip/GetBusUpdates")
-    Call<BusTripModel[]> GetBusInfo(@Query("route_id") int routeId, @Query("direction") String direction, @Query("counter_id") int counterPosition);
+    Call<BusTripModel[]> GetBusInfo(@Query("route_id") int routeId, @Query("direction") String direction, @Query("counter_position") int counterPosition);
 }

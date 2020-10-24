@@ -39,15 +39,14 @@ public class BusListAdapter extends RecyclerView.Adapter<BusListViewholder> {
 
     @Override
     public void onBindViewHolder(BusListViewholder holder, final int position) {
-        final BusTripModel busTripModel=busTripModelArrayList[position];
+        BusTripModel busTripModel=busTripModelArrayList[position];
         holder.txtBusRegNo.setText(busTripModel.getBusRegistrationNo());
         holder.txtLocation.setText(busTripModel.getAreaName());
-        holder.txtAvailableSeat.setText("");
+        holder.txtAvailableSeat.setText(position+" Seat");
         holder.busListParentView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(mContext, SalesInfoActivity.class);
-                intent.putExtra("bus_id",busTripModel.getBusId());
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 mContext.startActivity(intent);
             }

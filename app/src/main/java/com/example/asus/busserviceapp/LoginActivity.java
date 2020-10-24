@@ -156,7 +156,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLoginSuccess() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, SalesInfoActivity.class);
         startActivityForResult(intent, REQUEST_LOGIN);
         editor.putBoolean("autologin",true);
         editor.commit();
@@ -181,8 +181,7 @@ public class LoginActivity extends AppCompatActivity {
                     LoginModel.UserData returnvalue= ( response.body().getUserData());
 
                     int role_id=returnvalue.getRouteId();
-                    Log.e("Login",returnvalue.getDirection());
-                    Log.e("Login",returnvalue.getCompanyName());
+
                     editor.putString("user_name",returnvalue.getUserName());
                     editor.putString("password",returnvalue.getPassword());
                     editor.putString("full_name",returnvalue.getEmpFirstname()+" "+returnvalue.getEmpLastname());
