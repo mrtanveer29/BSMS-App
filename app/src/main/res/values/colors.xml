@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3fb58e</color>
+    <color name="colorPrimaryDark">#177659</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="appBackground">#FFF</color>
+    <color name="list_head_text">#cf000000</color>
+    <color name="list_detail_text">#787676</color>
+    <color name="list_subtitle_text">#df403f3f</color>
+    <color name="colourAdaTheme">#05C0C2</color>
+    <color name="blackShade">#9a000000</color>
+    <color name="colorLightGolden">#8ffffede</color>
+
+
+    <color name="black_overlay">#66000000</color>
+</resources>
